@@ -1,13 +1,11 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
-from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import CustomUser
 from .serializers import UserSerializer
 
 
@@ -57,6 +55,7 @@ def login(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def logout(request):
     try:
         refresh_token = request.data.get("refresh")
@@ -74,6 +73,7 @@ def logout(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def change_password(request):
     old_password = request.data.get("old_password")
     new_password = request.data.get("new_password")
@@ -102,6 +102,7 @@ def change_password(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def delete_account(request):
     try:
         user = request.user
@@ -119,6 +120,7 @@ def delete_account(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_data(request):
     try:
         user = request.user
