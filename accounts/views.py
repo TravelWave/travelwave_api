@@ -1,7 +1,11 @@
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser
 from .serializers import UserSerializer
@@ -26,24 +30,109 @@ def register(request):
 
 @api_view(["POST"])
 def login(request):
-    return Response()
+    phone_number = request.data.get("phone_number")
+    password = request.data.get("password")
+
+    user = authenticate(
+        request,
+        phone_number=phone_number,
+        password=password,
+    )
+
+    if user is None:
+        return Response(
+            {"error": "Invalid phone number or password."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    refresh = RefreshToken.for_user(user)
+
+    return Response(
+        {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["POST"])
 def logout(request):
-    return Response()
+    try:
+        refresh_token = request.data.get("refresh")
+        RefreshToken(refresh_token).blacklist()
+
+        return Response(
+            {"message": "Successfully logged out."},
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(["POST"])
 def change_password(request):
-    return Response()
+    old_password = request.data.get("old_password")
+    new_password = request.data.get("new_password")
+
+    user = request.user
+
+    if not check_password(old_password, user.password):
+        return Response(
+            {"error": "Incorrect old password."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if check_password(new_password, user.password):
+        return Response(
+            {"error": "Invalid password."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user.set_password(new_password)
+    user.save()
+
+    return Response(
+        {"message": "Password changed successfully."},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["POST"])
 def delete_account(request):
-    return Response()
+    try:
+        user = request.user
+        user.delete()
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(
+        {"message": "Account deleted successfully."},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["GET"])
 def get_user_data(request):
-    return Response()
+    try:
+        user = request.user
+
+        user_info = {
+            "full_name": user.full_name,
+            "phone_number": user.phone_number,
+            "is_driver": user.is_driver,
+            "driver_license": user.driver_license.url if user.driver_license else None,
+        }
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(user_info, status=status.HTTP_200_OK)
