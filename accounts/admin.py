@@ -11,6 +11,7 @@ class CustomUserAdmin(admin.ModelAdmin):
         "phone_number",
         "is_driver",
         "driver_license",
+        "rating",
         "password",
     ]
 

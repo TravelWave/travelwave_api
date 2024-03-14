@@ -35,7 +35,5 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "phone_number",
             "is_driver",
             "driver_license",
+            "rating",
         ]
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
