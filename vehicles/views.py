@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from accounts.models import CustomUser
 
-from .models import Vehicle
 from .serializers import VehicleSerializer
 
 
@@ -14,10 +13,9 @@ from .serializers import VehicleSerializer
 def vehicle_register(request):
     driver_id = request.data.get("driver_id")
 
-    try:
-        driver = CustomUser.objects.get(phone_number=driver_id)
-    except Exception as e:
-        return Response(str(e), status=status.HTTP_404_NOT_FOUND)
+    driver = CustomUser.objects.filter(phone_number=driver_id).first()
+    if driver is None:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = VehicleSerializer(data=request.data)
 
@@ -40,9 +38,8 @@ def vehicle_register(request):
 def update_vehicle_detail(request):
     driver_id = request.data.get("driver_id")
 
-    try:
-        driver = CustomUser.objects.get(phone_number=driver_id)
-    except Vehicle.DoesNotExist:
+    driver = CustomUser.objects.filter(phone_number=driver_id).first()
+    if driver is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = VehicleSerializer(driver.vehicle, data=request.data, partial=True)
