@@ -27,11 +27,15 @@ class CustomUser(AbstractBaseUser):
     is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=True)
     is_driver = models.BooleanField(default=False)
+
     driver_license = models.ImageField(
         upload_to="driver_license/",
-        blank=True,
         null=True,
+        blank=True,
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "phone_number"
     REQUIRED_FIELDS = ["full_name"]
@@ -40,9 +44,9 @@ class CustomUser(AbstractBaseUser):
 
     def save(self, *args, **kwargs):
         if self.is_driver and not self.driver_license:
-            raise ValidationError("Driver must have a driver license.")
+            raise ValidationError("Driver license is required.")
 
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.phone_number

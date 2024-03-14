@@ -6,11 +6,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserSerializer
+from .serializers import UpdateProfileSerializer, UserSerializer
 
 
 @api_view(["POST"])
-def register(request):
+def register_user(request):
     serializer = UserSerializer(data=request.data)
 
     if serializer.is_valid(raise_exception=True):
@@ -27,7 +27,7 @@ def register(request):
 
 
 @api_view(["POST"])
-def login(request):
+def login_user(request):
     phone_number = request.data.get("phone_number")
     password = request.data.get("password")
 
@@ -56,7 +56,7 @@ def login(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def logout(request):
+def logout_user(request):
     try:
         refresh_token = request.data.get("refresh")
         RefreshToken(refresh_token).blacklist()
@@ -74,7 +74,7 @@ def logout(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def change_password(request):
+def change_user_password(request):
     old_password = request.data.get("old_password")
     new_password = request.data.get("new_password")
 
@@ -103,7 +103,7 @@ def change_password(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def delete_account(request):
+def delete_user_account(request):
     try:
         user = request.user
         user.delete()
@@ -138,3 +138,22 @@ def get_user_data(request):
         )
 
     return Response(user_info, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def update_user_profile(request):
+    try:
+        user = request.user
+        serializer = UpdateProfileSerializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
