@@ -22,5 +22,7 @@ class Vehicle(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    is_busy = models.BooleanField(default=False)
+
     def __str__(self):
-        return self.license_plate
+        return str(self.license_plate)
