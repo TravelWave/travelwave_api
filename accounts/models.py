@@ -28,6 +28,8 @@ class CustomUser(AbstractBaseUser):
     is_superuser = models.BooleanField(default=True)
     is_driver = models.BooleanField(default=False)
 
+    rating = models.DecimalField(max_digits=5, decimal_places=1, default=5.0)
+
     driver_license = models.ImageField(
         upload_to="driver_license/",
         null=True,
