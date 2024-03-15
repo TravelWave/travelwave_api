@@ -11,6 +11,10 @@ STATUS_CHOICES = [
 
 
 class Ride(models.Model):
+    class Meta:
+        verbose_name = "Ride"
+        verbose_name_plural = "Rides"
+
     vehicle = models.ForeignKey(
         Vehicle,
         on_delete=models.CASCADE,
@@ -33,6 +37,10 @@ class Ride(models.Model):
 
 
 class RideHistory(models.Model):
+    class Meta:
+        verbose_name = "Ride History"
+        verbose_name_plural = "Ride History"
+
     passenger = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,

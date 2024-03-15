@@ -51,7 +51,7 @@ class CustomUser(AbstractBaseUser):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.phone_number
+        return str(self.phone_number)
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
