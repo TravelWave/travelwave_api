@@ -4,8 +4,7 @@ from .models import Ride, RideHistory
 
 
 class RideAdmin(admin.ModelAdmin):
-    class Meta:
-        model = Ride
+    model = Ride
 
     list_display = [
         "vehicle",

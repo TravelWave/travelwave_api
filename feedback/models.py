@@ -5,9 +5,20 @@ from rides.models import Ride
 
 
 class Feedback(models.Model):
-    ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
-    passenger = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    driver = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    ride = models.ForeignKey(
+        Ride,
+        on_delete=models.CASCADE,
+    )
+    passenger = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="rider_feedbacks",
+    )
+    driver = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="passenger_feedbacks",
+    )
     rating = models.DecimalField(max_digits=3, decimal_places=1)
     feedback = models.TextField()
 

@@ -11,8 +11,16 @@ from .serializers import FeedbackSerializer
 def rate(request):
     serializer = FeedbackSerializer(request.data)
 
+    reviewer = request.data.get("reviewer")
+    reviewee = request.data.get("reviewee")
+    ride = request.data.get("ride")
+
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
+        serializer.save(
+            reviewer=reviewer,
+            reviewee=reviewee,
+            ride=ride,
+        )
         return Response(
             serializer.data,
             status=status.HTTP_200_OK,
