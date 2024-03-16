@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "accounts",
     "vehicles",
     "rides",
+    "feedback",
 ]
 
 MIDDLEWARE = [
